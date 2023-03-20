@@ -7,10 +7,24 @@ namespace TripServiceKata.Tests;
 public class TripServiceTest
 {
     [Fact]
-    public void Should_Throw_Exception_When_User_Not_LoggedIn()
+    public void Should_Throw_Exception_When_User_Not_Logged()
     {
-        ((Action)(() => new TripService().GetTripsByUser(new TripServiceKata.User.User())))
+        var loggedUser = new User.User();
+        
+        ((Action)(() => new TestableTripService(loggedUser).GetTripsByUser(loggedUser)))
         .Should()
-        .NotThrow();
+        .Throw<UserNotLoggedInException>();
+    }
+
+    private class TestableTripService: TripService
+    {
+        User.User MockInputUser {get; init;}
+
+        public TestableTripService(User.User mockInputUser)
+        {
+            MockInputUser = mockInputUser;    
+        }
+
+        public override User.User GetLoggedUser() => MockInputUser;
     }
 }
